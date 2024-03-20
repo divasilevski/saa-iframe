@@ -50,8 +50,9 @@
             // Need to call requestStorageAccess() after a user interaction
             // Can't do anything further here, so handle this in the click handler
             console.log("Cookie access requires a prompt");
-            await document.requestStorageAccess();
-            return true;
+
+            // await document.requestStorageAccess();
+            return false;
           } else if (permission.state === "denied") {
             // Currently not used. See:
             // https://github.com/privacycg/storage-access/issues/149
@@ -75,20 +76,24 @@
 
       $btn.onclick = async () => {
         // Safari variant
-        // await document.requestStorageAccess();
+        await document.requestStorageAccess();
 
-        // if (await document.hasStorageAccess()) {
-        //   window.parent.postMessage(document.cookie, "*");
-        // }
-
-        // Firefox
-        if (await hasCookieAccess()) {
+        if (await document.hasStorageAccess()) {
           window.parent.postMessage(document.cookie, "*");
         }
+
+        // Firefox
+        // if (await hasCookieAccess()) {
+        //   window.parent.postMessage(document.cookie, "*");
+        // }
 
         $view.innerHTML = document.cookie;
         console.log("hasAccess", await hasCookieAccess());
       };
+
+      window.onload = () => {
+        hasCookieAccess()
+      }
     </script>
   </body>
 </html>
