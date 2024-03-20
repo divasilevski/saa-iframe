@@ -50,7 +50,8 @@
             // Need to call requestStorageAccess() after a user interaction
             // Can't do anything further here, so handle this in the click handler
             console.log("Cookie access requires a prompt");
-            return false;
+            await document.requestStorageAccess();
+            return true;
           } else if (permission.state === "denied") {
             // Currently not used. See:
             // https://github.com/privacycg/storage-access/issues/149
