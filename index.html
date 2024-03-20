@@ -2,6 +2,7 @@
 <html>
   <body>
     <button id="btn">Send cookie</button>
+    <span>Cookie:</span><span id="view"></span>
 
     <script>
       async function hasCookieAccess() {
@@ -20,10 +21,13 @@
       }
 
       const $btn = document.querySelector("#btn");
+      const $view = document.querySelector("#view");
 
       $btn.onclick = async () => {
         const hasAccess = await hasCookieAccess();
         if (hasAccess) window.parent.postMessage(document.cookie, "*");
+
+        $view.innerHTML = document.cookie
       };
     </script>
   </body>
