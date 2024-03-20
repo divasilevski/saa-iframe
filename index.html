@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+  <body>
+    <button id="btn">Send cookie</button>
+
+    <script>
+      async function hasCookieAccess() {
+        if (await document.hasStorageAccess()) {
+          return true;
+        }
+
+        try {
+          await document.requestStorageAccess();
+          return true;
+        } catch (error) {
+          return false;
+        }
+
+        return false;
+      }
+
+      const $btn = document.querySelector("#btn");
+
+      $btn.onclick = async () => {
+        const hasAccess = await hasCookieAccess();
+        if (hasAccess) window.parent.postMessage(document.cookie, "*");
+      };
+    </script>
+  </body>
+</html>
