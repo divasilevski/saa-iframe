@@ -30,7 +30,7 @@
           hasAccess = true;
         }
 
-        if (hasAccess) {
+        if (!hasAccess) {
           try {
             await document.requestStorageAccess();
             hasAccess = true;
