@@ -5,29 +5,44 @@
     <span>Cookie:</span><span id="view"></span>
 
     <script>
-      async function hasCookieAccess() {
-        if (await document.hasStorageAccess()) {
-          return true;
-        }
+      // async function hasCookieAccess() {
+      //   if (await document.hasStorageAccess()) {
+      //     return true;
+      //   }
 
-        try {
-          await document.requestStorageAccess();
-          return true;
-        } catch (error) {
-          return false;
-        }
+      //   try {
+      //     await document.requestStorageAccess();
+      //     return true;
+      //   } catch (error) {
+      //     return false;
+      //   }
 
-        return false;
-      }
+      //   return false;
+      // }
 
       const $btn = document.querySelector("#btn");
       const $view = document.querySelector("#view");
 
       $btn.onclick = async () => {
-        const hasAccess = await hasCookieAccess();
+        let hasAccess = false;
+
+        if (await document.hasStorageAccess()) {
+          hasAccess = true;
+        }
+
+        if (hasAccess) {
+          try {
+            await document.requestStorageAccess();
+            hasAccess = true;
+          } catch (error) {
+            console.warn(error)
+          }
+        }
+
         if (hasAccess) window.parent.postMessage(document.cookie, "*");
 
-        $view.innerHTML = document.cookie
+        $view.innerHTML = document.cookie;
+        console.log('hasAccess', hasAccess)
       };
     </script>
   </body>
