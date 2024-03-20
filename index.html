@@ -24,23 +24,12 @@
       const $view = document.querySelector("#view");
 
       $btn.onclick = async () => {
-        let hasAccess = false;
+        await document.requestStorageAccess();
 
-        if (await document.hasStorageAccess()) {
-          hasAccess = true;
-        }
-
-        try {
-          await document.requestStorageAccess();
-          hasAccess = true;
-        } catch (error) {
-          console.warn(error);
-        }
-
-        if (hasAccess) window.parent.postMessage(document.cookie, "*");
+        if (await document.hasStorageAccess()) window.parent.postMessage(document.cookie, "*");
 
         $view.innerHTML = document.cookie;
-        console.log("hasAccess", hasAccess);
+        console.log("hasAccess", await document.hasStorageAccess());
       };
     </script>
   </body>
