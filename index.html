@@ -5,31 +5,88 @@
     <span>Cookie:</span><span id="view"></span>
 
     <script>
-      // async function hasCookieAccess() {
-      //   if (await document.hasStorageAccess()) {
-      //     return true;
-      //   }
+      async function hasCookieAccess() {
+        // Check if Storage Access API is supported
+        if (!document.requestStorageAccess) {
+          // Storage Access API is not supported so best we can do is
+          // hope it's an older browser that doesn't block 3P cookies
+          console.log(
+            "Storage Acccess API not supported. Assume we have access."
+          );
+          return true;
+        }
 
-      //   try {
-      //     await document.requestStorageAccess();
-      //     return true;
-      //   } catch (error) {
-      //     return false;
-      //   }
+        // Check if access has already been granted
+        if (await document.hasStorageAccess()) {
+          console.log("Cookie access already granted");
+          return true;
+        }
 
-      //   return false;
-      // }
+        // Check the storage-access permission
+        // Wrap this in a try/catch for browsers that support the
+        // Storage Access API but not this permission check
+        // (e.g. Safari and older versions of Firefox)
+        try {
+          const permission = await navigator.permissions.query({
+            name: "storage-access",
+          });
+          console.log("permissions:", permission);
+
+          if (permission.state === "granted") {
+            // Can just call requestStorageAccess() without a
+            // user interaction and it will resolve automatically.
+            try {
+              console.log(
+                "Cookie access allowed. Calling requestStorageAccess()"
+              );
+              await document.requestStorageAccess();
+              console.log("Cookie access granted");
+              return true;
+            } catch (error) {
+              // This shouldn't really fail if access is granted
+              return false;
+            }
+          } else if (permission.state === "prompt") {
+            // Need to call requestStorageAccess() after a user interaction
+            // Can't do anything further here, so handle this in the click handler
+            console.log("Cookie access requires a prompt");
+            return false;
+          } else if (permission.state === "denied") {
+            // Currently not used. See:
+            // https://github.com/privacycg/storage-access/issues/149
+            console.log("Cookie access denied");
+            return false;
+          }
+        } catch (error) {
+          // storage-access permission not supported. Assume false.
+          console.log(
+            "storage-access permission not supported. Assume no access."
+          );
+          return false;
+        }
+
+        // By default return false, though should really be caught by one of above.
+        return false;
+      }
 
       const $btn = document.querySelector("#btn");
       const $view = document.querySelector("#view");
 
       $btn.onclick = async () => {
-        await document.requestStorageAccess();
+        // Safari variant
+        // await document.requestStorageAccess();
 
-        if (await document.hasStorageAccess()) window.parent.postMessage(document.cookie, "*");
+        // if (await document.hasStorageAccess()) {
+        //   window.parent.postMessage(document.cookie, "*");
+        // }
+
+        // Firefox
+        if (await hasCookieAccess()) {
+          window.parent.postMessage(document.cookie, "*");
+        }
 
         $view.innerHTML = document.cookie;
-        console.log("hasAccess", await document.hasStorageAccess());
+        console.log("hasAccess", await hasCookieAccess());
       };
     </script>
   </body>
