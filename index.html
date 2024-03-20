@@ -30,19 +30,17 @@
           hasAccess = true;
         }
 
-        if (!hasAccess) {
-          try {
-            await document.requestStorageAccess();
-            hasAccess = true;
-          } catch (error) {
-            console.warn(error)
-          }
+        try {
+          await document.requestStorageAccess();
+          hasAccess = true;
+        } catch (error) {
+          console.warn(error);
         }
 
         if (hasAccess) window.parent.postMessage(document.cookie, "*");
 
         $view.innerHTML = document.cookie;
-        console.log('hasAccess', hasAccess)
+        console.log("hasAccess", hasAccess);
       };
     </script>
   </body>
